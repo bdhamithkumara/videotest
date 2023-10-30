@@ -1,11 +1,12 @@
 import './App.css'
-import VideoChat from './VideoChat'
+import Peeer from './Peeer'
+//import VideoChat from './VideoChat'
 
 function App() {
 
   return (
     <>
-      <VideoChat/>
+      <Peeer/>
     </>
   )
 }
