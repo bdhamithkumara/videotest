@@ -1,10 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Peer from 'peerjs';
 
 function Peeer() {
   const localVideoRef = useRef();
   const remoteVideoRef = useRef();
   const peer = useRef(null);
+
+  const [userList, setUserList] = useState([]);
+  const [callingPeer, setCallingPeer] = useState(null);
 
   useEffect(() => {
     // Initialize PeerJS
@@ -15,20 +18,8 @@ function Peeer() {
     });
 
     peer.current.on('call', (call) => {
-      // Answer the call and set up the video stream
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((stream) => {
-          call.answer(stream);
-          call.on('stream', (remoteStream) => {
-            if (remoteVideoRef.current) {
-              remoteVideoRef.current.srcObject = remoteStream;
-            }
-          });
-        })
-        .catch((error) => {
-          console.error('Error accessing the camera and microphone:', error);
-        });
+      setCallingPeer(call.peer); // Store the peer ID of the caller
+      // Handle incoming call (e.g., show a notification)
     });
 
     // Access the local camera and microphone
@@ -53,13 +44,18 @@ function Peeer() {
     if (!remotePeerId) return;
 
     const localStream = localVideoRef.current.srcObject;
-
     const call = peer.current.call(remotePeerId, localStream);
+
     call.on('stream', (remoteStream) => {
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = remoteStream;
       }
     });
+  };
+
+  const endCall = () => {
+    // End the call and clean up resources
+    // Close video streams and reset the UI
   };
 
   return (
@@ -70,6 +66,23 @@ function Peeer() {
         <video ref={remoteVideoRef} autoPlay></video>
       </div>
       <button onClick={callPeer}>Call a Peer</button>
+      {callingPeer && (
+        <div>
+          Calling {callingPeer}...
+          <button onClick={endCall}>End Call</button>
+        </div>
+      )}
+      <div>
+        <h3>User List</h3>
+        <ul>
+          {userList.map((user) => (
+            <li key={user.id}>
+              {user.name}{' '}
+              <button onClick={() => callPeer(user.id)}>Call</button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
