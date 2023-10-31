@@ -81,10 +81,15 @@ function Peeer() {
     });
   };
 
+  const callEnd = () => {
+    peer.current.destroy();
+  }
+
   return (
     <div>
       <h2>Video Chat App</h2>
       <div>
+        <p>share your ID to make the call</p>
         <textarea ref={textAreaRef} value={callId} readOnly />
         <button onClick={copyToClipboard}>Copy Text</button>
       </div>
@@ -93,6 +98,7 @@ function Peeer() {
         <video ref={remoteVideoRef} autoPlay></video>
       </div>
       <button onClick={callPeer}>Call a Peer</button>
+      <button onClick={callEnd}>End call</button>
     </div>
   );
 }
